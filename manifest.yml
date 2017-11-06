@@ -1,0 +1,15 @@
+---
+declared-services:
+  my-conversation-service:
+    label: conversation
+    plan: lite
+applications:
+- name: test_Watson_External_API_NodeJS
+  command: npm start
+  path: .
+  memory: 256M
+  instances: 1
+  services:
+  - Conversation
+  env:
+    NPM_CONFIG_PRODUCTION: false
