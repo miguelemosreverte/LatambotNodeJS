@@ -19,8 +19,6 @@
 var express = require('express'); // app server
 var bodyParser = require('body-parser'); // parser for post requests
 var Conversation = require('watson-developer-cloud/conversation/v1'); // watson sdk
-var request = require('request');
-var rp = require('request-promise');
 
 var app = express();
 
@@ -58,8 +56,27 @@ app.post('/api/message', function(req, res) {
     if (err) {
       return res.status(err.code || 500).json(err);
     }
-    return res.json(updateMessage(payload, data));
+
+    if (data.context.hasOwnProperty("FlaskCalculator")){
+      delete data.context.FlaskCalculator
+
+      // HERE WE CALL PYTHON
+
+
+      // HERE WE OBTAIN THE RESPONSE FROM PYTHON
+
+      data.output.text = "YAY";
+      return res.json(data);
+
+    } else {
+
+      return res.json(data);
+    }
+
   });
+
+
+
 });
 
 
@@ -69,39 +86,13 @@ app.post('/api/message', function(req, res) {
  * @param  {Object} response The response from the Conversation service
  * @return {Object}          The response with the updated message
  */
-function updateMessage(input, response) {
-  if (!response.output) {
-    response.output = {};
+function updateMessage(payload, data) {
+  if (!data.output) {
+    data.output = {};
   } else {
-    if (response.context.hasOwnProperty("FlaskCalculator")){
-      //TODO replace with on/off flag state
-      delete response.context.FlaskCalculator
-
-
-      var options = {
-          method: 'POST',
-          uri: "https://flasktest.mybluemix.net/api/setParameters",
-          body: {
-              "age" : response.context.age,
-              "gender" : response.context.gender,
-              "country" : response.context.country
-          },
-          json: true // Automatically stringifies the body to JSON
-      };
-
-      rp(options)
-          .then(function (parsedBody) {
-              // POST succeeded...
-              console.log(parsedBody)
-          })
-          .catch(function (err) {
-              // POST failed...
-              console.log(err)
-          });
-
-    }
-    return response;
+    console.log(data)
   }
+  return data;
 }
 
 module.exports = app;
