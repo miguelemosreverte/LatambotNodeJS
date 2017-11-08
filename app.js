@@ -56,27 +56,19 @@ app.post('/api/message', function(req, res) {
     if (err) {
       return res.status(err.code || 500).json(err);
     }
-
-    if (data.context.hasOwnProperty("FlaskCalculator")){
-      delete data.context.FlaskCalculator
-
-      // HERE WE CALL PYTHON
+    else{
+      if (data.context.hasOwnProperty("FlaskCalculator")){
+        delete data.context.FlaskCalculator
 
 
-      // HERE WE OBTAIN THE RESPONSE FROM PYTHON
-
-      data.output.text = "YAY";
-      return res.json(data);
-
-    } else {
-
-      return res.json(data);
+        data.output.text = "Necesitará un seguro que tenga en cuenta que usted es de "
+                      + data.context.country + " y que su género es "
+                      + data.context.gender + " y que tiene "
+                      + data.context.age + " años de edad."
+      }
+      return res.json(updateMessage(payload, data));
     }
-
   });
-
-
-
 });
 
 
@@ -86,13 +78,12 @@ app.post('/api/message', function(req, res) {
  * @param  {Object} response The response from the Conversation service
  * @return {Object}          The response with the updated message
  */
-function updateMessage(payload, data) {
-  if (!data.output) {
-    data.output = {};
+function updateMessage(input, response) {
+  if (!response.output) {
+    response.output = {};
   } else {
-    console.log(data)
+    return response;
   }
-  return data;
 }
 
 module.exports = app;
